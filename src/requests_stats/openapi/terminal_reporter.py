@@ -6,15 +6,18 @@ class TerminalReporter:
     def __init__(self, coverage: Coverage) -> None:
         self.coverage = coverage
 
-    def create(self) -> None:
-        print(
-            dedent(
-                f"""
+    def render(self) -> str:
+        covered = sorted(self.coverage.covered)
+        uncovered = sorted(self.coverage.uncovered)
+        return dedent(
+            f"""
                 Covered operations/responses:
-                    {"\n\t".join(f"{x[0]} {x[1]} returns {x[2]}" for x in self.coverage.covered) if self.coverage.covered else "None"}
+                    {"\n\t".join(f"{x[0]} {x[1]} returns {x[2]}" for x in covered) if covered else "None"}
 
                 Uncovered operations/responses:
-                    {"\n\t".join(f"{x[0]} {x[1]} returns {x[2]}" for x in self.coverage.uncovered) if self.coverage.uncovered else "None"}
-                """
-            )
+                    {"\n\t".join(f"{x[0]} {x[1]} returns {x[2]}" for x in uncovered) if uncovered else "None"}
+            """
         )
+
+    def create(self) -> None:
+        print(self.render())

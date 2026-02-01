@@ -24,11 +24,13 @@ class Coverage:
         for path in self.spec.paths:
             for operation in path.operations:
                 for response in operation.responses:
+                    if response.is_default or response.code is None:
+                        continue
                     endpoints.add(
                         (
                             operation.method.name,
                             path.url,
-                            int(response.code or 0),
-                        )  # TODO: fix "or" workaround
+                            int(response.code),
+                        )
                     )
         return endpoints

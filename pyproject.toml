@@ -28,5 +28,6 @@ dev = [
   "pytest-httpserver>=1.1.3",
   "pytest-pretty>=1.3.0",
   "ruff>=0.13.1",
+  "testcontainers>=4.10.0",
   "types-requests>=2.32.4.20250913",
 ]
