@@ -37,7 +37,10 @@ class HtmlReporter:
     def render(self) -> str:
         groups = self._collect_groups()
         tags_map = self._group_by_tags(groups)
-        extra = sorted(self.coverage.extra)
+        extra = sorted(
+            self.coverage.extra_details,
+            key=lambda item: (item[0], item[2], item[3], item[1]),
+        )
 
         covered_count = len(self.coverage.covered)
         uncovered_count = len(self.coverage.uncovered)
@@ -222,7 +225,9 @@ class HtmlReporter:
             "</div>"
         )
 
-    def _render_extra_section(self, extra: list[tuple[str, str, int]]) -> list[str]:
+    def _render_extra_section(
+        self, extra: list[tuple[str, str, str, int]]
+    ) -> list[str]:
         if not extra:
             return []
         parts = [
@@ -233,11 +238,16 @@ class HtmlReporter:
             "      </div>",
             '      <div class="ops">',
         ]
-        for method, path, code in extra:
+        for method, original_path, normalized_path, code in extra:
+            path_html = escape(original_path)
+            normalized_html = ""
+            if normalized_path != original_path:
+                normalized_html = f'<span class="path path--normalized">-> {escape(normalized_path)}</span>'
             parts.append(
                 '        <div class="op">'
                 f'<span class="method method--{escape(method.lower())}">{escape(method)}</span>'
-                f'<span class="path">{escape(path)}</span>'
+                f'<span class="path">{path_html}</span>'
+                f"{normalized_html}"
                 f'<span class="response">{escape(str(code))}</span>'
                 '<span class="status status--extra">extra</span>'
                 "</div>"
@@ -508,6 +518,12 @@ class HtmlReporter:
     .path {
       font-family: "JetBrains Mono", "Fira Code", "SFMono-Regular", "Menlo", monospace;
       font-size: 0.95rem;
+    }
+
+    .path--normalized {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-left: 6px;
     }
 
     .response {
