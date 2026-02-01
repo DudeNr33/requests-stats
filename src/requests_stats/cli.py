@@ -11,12 +11,12 @@ app = typer.Typer()
 
 
 @app.command()
-def latency():
+def latency() -> None:
     print("Response times statistics")
 
 
 @app.command()
-def coverage(recording: Path, spec: Path):
+def coverage(recording: Path, spec: Path) -> None:
     print("Covered endpoints from OpenAPI specification:")
     recorder = SQLiteRecorder(filepath=str(recording))
     coverage = Coverage(openapi_file_path=str(spec))
@@ -25,7 +25,7 @@ def coverage(recording: Path, spec: Path):
     reporter.create()
 
 
-def main():
+def main() -> None:
     app()
 
 
