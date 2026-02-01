@@ -1,9 +1,9 @@
-import time
 from pathlib import Path
 
 import pytest
 import requests
 from testcontainers.core.container import DockerContainer
+from testcontainers.core.wait_strategies import HttpWaitStrategy
 
 from requests_stats.adapter import RecordingHTTPAdapter
 from requests_stats.openapi.coverage import Coverage
@@ -14,24 +14,16 @@ PETSTORE_IMAGE = "swaggerapi/petstore3"
 OPENAPI_PATH = "/api/v3/openapi.json"
 
 
-def wait_for_petstore(base_url: str) -> None:
-    deadline = time.time() + 30
-    while time.time() < deadline:
-        try:
-            response = requests.get(f"{base_url}{OPENAPI_PATH}", timeout=2)
-            if response.status_code == 200:
-                return
-        except requests.RequestException:
-            time.sleep(0.5)
-    raise RuntimeError("petstore container did not become ready")
-
-
 def generate_petstore_html_report(output_path: Path, workdir: Path) -> str:
-    with DockerContainer(PETSTORE_IMAGE).with_exposed_ports(8080) as container:
+    wait_strategy = HttpWaitStrategy(8080, OPENAPI_PATH).for_status_code(200)
+    with (
+        DockerContainer(PETSTORE_IMAGE)
+        .with_exposed_ports(8080)
+        .waiting_for(wait_strategy)
+    ) as container:
         host = container.get_container_host_ip()
         port = container.get_exposed_port(8080)
         base_url = f"http://{host}:{port}"
-        wait_for_petstore(base_url)
 
         spec_response = requests.get(f"{base_url}{OPENAPI_PATH}", timeout=5)
         spec_response.raise_for_status()
