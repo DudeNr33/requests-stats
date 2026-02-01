@@ -8,7 +8,10 @@ requires-python = ">=3.13"
 dependencies = ["requests>=2.32.5"]
 
 [project.optional-dependencies]
-openapi = ["openapi3-parser>=1.1.21"]
+openapi = [
+    "jinja2>=3.1.6",
+    "openapi3-parser>=1.1.21",
+]
 cli = [
     "typer>=0.19.2",
 ]
@@ -19,6 +22,7 @@ requests-stats = "requests_stats.cli:main"
 [build-system]
 requires = ["uv_build>=0.8.17,<0.9.0"]
 build-backend = "uv_build"
+
 
 [dependency-groups]
 dev = [
