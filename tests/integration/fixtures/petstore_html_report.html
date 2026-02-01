@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenAPI Coverage Report</title>
+  <style>
+
+    :root {
+      --bg: #f6f9fc;
+      --bg-accent: #eef3f9;
+      --card: #ffffff;
+      --border: #d8e2ee;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #3b82f6;
+      --covered: #22c55e;
+      --uncovered: #ef4444;
+      --extra: #f59e0b;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", "Source Sans 3", "Noto Sans", "Helvetica Neue", sans-serif;
+      color: var(--text);
+      background: linear-gradient(135deg, var(--bg) 0%, var(--bg-accent) 100%);
+    }
+
+    h1, h2 {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    h2 {
+      font-size: 1.35rem;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    .hero {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px;
+      background: var(--card);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.72rem;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin: 8px 0 0;
+    }
+
+    .summary {
+      min-width: 260px;
+    }
+
+    .summary__metric {
+      font-size: 0.95rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .summary__metric span {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .summary__bar {
+      height: 8px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      overflow: hidden;
+      margin: 10px 0 6px;
+    }
+
+    .summary__bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--covered), #16a34a);
+    }
+
+    .summary__percent {
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .tag {
+      background: var(--card);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .tag__summary {
+      list-style: none;
+      cursor: pointer;
+      display: grid;
+      gap: 8px;
+      position: relative;
+      padding-right: 28px;
+    }
+
+    .tag__summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .tag__summary::after {
+      content: "▾";
+      position: absolute;
+      right: 0;
+      top: 2px;
+      color: var(--muted);
+      font-size: 1rem;
+      transition: transform 0.2s ease;
+    }
+
+    details.tag[open] > .tag__summary::after {
+      transform: rotate(180deg);
+    }
+
+    .tag__header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .tag__meta {
+      display: flex;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .tag__meta-item--covered {
+      color: rgb(34, 197, 94);
+    }
+
+    .tag__meta-item--partial {
+      color: rgb(245, 158, 11);
+    }
+
+    .tag__meta-item--uncovered {
+      color: rgb(239, 68, 68);
+    }
+
+    .tag__bar {
+      height: 6px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      overflow: hidden;
+    }
+
+    .tag__bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--covered), #22c55e);
+    }
+
+    .ops {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .op {
+      display: grid;
+      grid-template-columns: auto 1fr auto auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      position: relative;
+    }
+
+    details.op {
+      display: block;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    details.op > summary {
+      list-style: none;
+      display: grid;
+      grid-template-columns: auto 1fr auto auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      cursor: pointer;
+    }
+
+    details.op > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .op__summary {
+      padding: 0 14px 10px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .op--empty {
+      background: #fdfdfd;
+      text-align: center;
+      color: var(--muted);
+      grid-template-columns: 1fr;
+    }
+
+    .op__empty {
+      padding: 8px 0;
+    }
+
+    .method {
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .method--get { background: #22c55e; }
+    .method--post { background: #3b82f6; }
+    .method--put { background: #f97316; }
+    .method--patch { background: #14b8a6; }
+    .method--delete { background: #ef4444; }
+    .method--options { background: #6366f1; }
+    .method--head { background: #64748b; }
+    .method--trace { background: #0ea5e9; }
+
+    .path {
+      font-family: "JetBrains Mono", "Fira Code", "SFMono-Regular", "Menlo", monospace;
+      font-size: 0.95rem;
+    }
+
+    .path--normalized {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-left: 6px;
+    }
+
+    .response {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+
+    .status {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: var(--muted);
+    }
+
+    .status--covered { background: rgba(34, 197, 94, 0.12); color: #15803d; }
+    .status--uncovered { background: rgba(239, 68, 68, 0.12); color: #b91c1c; }
+    .status--extra { background: rgba(245, 158, 11, 0.15); color: #b45309; }
+
+    .responses {
+      display: grid;
+      gap: 8px;
+      padding: 0 14px 14px;
+    }
+
+    .responses__label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .response-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: #eef2f7;
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+
+    .response-code {
+      font-weight: 600;
+      font-family: "JetBrains Mono", "Fira Code", "SFMono-Regular", "Menlo", monospace;
+    }
+
+    .response-desc {
+      color: var(--muted);
+    }
+
+    @media (max-width: 720px) {
+      .hero {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .op {
+        grid-template-columns: auto 1fr;
+      }
+
+      details.op > summary {
+        grid-template-columns: auto 1fr;
+      }
+
+      .response-item {
+        grid-template-columns: auto 1fr;
+      }
+
+      .response, .status {
+        justify-self: start;
+      }
+    }
+        
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div>
+        <div class="eyebrow">OpenAPI Coverage</div>
+        <h1>HTTP Coverage Report</h1>
+        <p class="subtitle">Recorded requests vs. OpenAPI operations</p>
+      </div>
+      <div class="summary">
+        <div class="summary__metric"><span>7</span> covered</div>
+        <div class="summary__metric"><span>38</span> uncovered</div>
+        <div class="summary__metric"><span>1</span> extra</div>
+        <div class="summary__bar">
+          <div class="summary__bar-fill" style="width: 15.6%"></div>
+        </div>
+        <div class="summary__percent">15.6% covered</div>
+      </div>
+    </header>
+    <details class="tag" open>
+      <summary class="tag__summary">
+        <div class="tag__header">
+          <h2>pet</h2>
+          <div class="tag__meta">
+            <span class="tag__meta-item tag__meta-item--covered">0 covered</span>
+            <span class="tag__meta-item tag__meta-item--partial">5 partial</span>
+            <span class="tag__meta-item tag__meta-item--uncovered">3 uncovered</span>
+          </div>
+        </div>
+        <div class="tag__bar">
+          <div class="tag__bar-fill" style="width: 28.6%"></div>
+        </div>
+      </summary>
+      <div class="ops">
+        <details class="op"><summary><span class="method method--get">GET</span><span class="path">/pet/findByStatus</span><span class="response">1/2 covered</span><span class="status status--extra">partial</span></summary><div class="op__summary">Finds Pets by status.</div><div class="responses"><div class="responses__label">Documented responses</div><div class="response-item"><span class="response-code">200</span><span class="response-desc">successful operation</span><span class="status status--covered">covered</span></div><div class="response-item"><span class="response-code">400</span><span class="response-desc">Invalid status value</span><span class="status status--uncovered">uncovered</span></div></div></details>
+        <details class="op"><summary><span class="method method--get">GET</span><span class="path">/pet/findByTags</span><span class="response">0/2 covered</span><span class="status status--uncovered">uncovered</span></summary><div class="op__summary">Finds Pets by tags.</div><div class="responses"><div class="responses__label">Documented responses</div><div class="response-item"><span class="response-code">200</span><span class="response-desc">successful operation</span><span class="status status--uncovered">uncovered</span></div><div class="response-item"><span class="response-code">400</span><span class="response-desc">Invalid tag value</span><span class="status status--uncovered">uncovered</span></div></div></details>
+        <details class="op"><summary><span class="method method--get">GET</span><span class="path">/pet/{petId}</span><span class="response">2/3 covered</span><span class="status status--extra">partial</span></summary><div class="op__summary">Find pet by ID.</div><div class="responses"><div class="responses__label">Documented responses</div><div class="response-item"><span class="response-code">200</span><span class="response-desc">successful operation</span><span class="status status--covered">covered</span></div><div class="response-item"><span class="response-code">400</span><span class="response-desc">Invalid ID supplied</span><span class="status status--uncovered">uncovered</span></div><div class="response-item"><span class="response-code">404</span><span class="response-desc">Pet not found</span><span class="status status--covered">covered</span></div></div></details>
+        <details class="op"><summary><span class="method method--post">POST</span><span class="path">/pet</span><span class="response">1/3 covered</span><span class="status status--extra">partial</span></summary><div class="op__summary">Add a new pet to the store.</div><div class="responses"><div class="responses__label">Documented responses</div><div class="response-item"><span class="response-code">200</span><span class="response-desc">Successful operation</span><span class="status status--covered">covered</span></div><div class="response-item"><span class="response-code">400</span><span class="response-desc">Invalid input</span><span class="status status--uncovered">uncovered</span></div><div class="response-item"><span class="response-code">422</span><span class="response-desc">Validation exception</span><span class="status status--uncovered">uncovered</span></div></div></details>
+        <details class="op"><summary><span class="method method--post">POST</span><span class="path">/pet/{petId}</span><span class="response">0/2 covered</span><span class="status status--uncovered">uncovered</span></summary><div class="op__summary">Updates a pet in the store with form data.</div><div class="responses"><div class="responses__label">Documented responses</div><div class="response-item"><span class="response-code">200</span><span class="response-desc">successful operation</span><span class="status status--uncovered">uncovered</span></div><div class="response-item"><span class="response-code">400</span><span class="response-desc">Invalid input</span><span class="status status--uncovered">uncovered</span></div></div></details>
+        <details class="op"><summary><span class="method method--post">POST</span><span class="path">/pet/{petId}/uploadImage</span><span class="response">0/3 covered</span><span class="status status--uncovered">uncovered</span></summary><div class="op__summary">Uploads an image.</div><div class="responses"><div class="responses__label">Documented responses</div><div class="response-item"><span class="response-code">200</span><span class="response-desc">successful operation</span><span class="status status--uncovered">uncovered</span></div><div class="response-item"><span class="response-code">400</span><span class="response-desc">No file uploaded</span><span class="status status--uncovered">uncovered</span></div><div class="response-item"><span class="response-code">404</span><span class="response-desc">Pet not found</span><span class="status status--uncovered">uncovered</span></div></div></details>
+        <details class="op"><summary><span class="method method--put">PUT</span><span class="path">/pet</span><span class="response">1/4 covered</span><span class="status status--extra">partial</span></summary><div class="op__summary">Update an existing pet.</div><div class="responses"><div class="responses__label">Documented responses</div><div class="response-item"><span class="response-code">200</span><span class="response-desc">Successful operation</span><span class="status status--covered">covered</span></div><div class="response-item"><span class="response-code">400</span><span class="response-desc">Invalid ID supplied</span><span class="status status--uncovered">uncovered</span></div><div class="response-item"><span class="response-code">404</span><span class="response-desc">Pet not found</span><span class="status status--uncovered">uncovered</span></div><div class="response-item"><span class="response-code">422</span><span class="response-desc">Validation exception</span><span class="status status--uncovered">uncovered</span></div></div></details>
+        <details class="op"><summary><span class="method method--delete">DELETE</span><span class="path">/pet/{petId}</span><span class="response">1/2 covered</span><span class="status status--extra">partial</span></summary><div class="op__summary">Deletes a pet.</div><div class="responses"><div class="responses__label">Documented responses</div><div class="response-item"><span class="response-code">200</span><span class="response-desc">Pet deleted</span><span class="status status--covered">covered</span></div><div class="response-item"><span class="response-code">400</span><span class="response-desc">Invalid pet value</span><span class="status status--uncovered">uncovered</span></div></div></details>
+      </div>
+    </details>
+    <details class="tag" open>
+      <summary class="tag__summary">
+        <div class="tag__header">
+          <h2>store</h2>
+          <div class="tag__meta">
+            <span class="tag__meta-item tag__meta-item--covered">1 covered</span>
+            <span class="tag__meta-item tag__meta-item--partial">0 partial</span>
+            <span class="tag__meta-item tag__meta-item--uncovered">3 uncovered</span>
+          </div>
+        </div>
+        <div class="tag__bar">
+          <div class="tag__bar-fill" style="width: 10.0%"></div>
+        </div>
+      </summary>
+      <div class="ops">
+        <details class="op"><summary><span class="method method--get">GET</span><span class="path">/store/inventory</span><span class="response">1/1 covered</span><span class="status status--covered">covered</span></summary><div class="op__summary">Returns pet inventories by status.</div><div class="responses"><div class="responses__label">Documented responses</div><div class="response-item"><span class="response-code">200</span><span class="response-desc">successful operation</span><span class="status status--covered">covered</span></div></div></details>
+        <details class="op"><summary><span class="method method--get">GET</span><span class="path">/store/order/{orderId}</span><span class="response">0/3 covered</span><span class="status status--uncovered">uncovered</span></summary><div class="op__summary">Find purchase order by ID.</div><div class="responses"><div class="responses__label">Documented responses</div><div class="response-item"><span class="response-code">200</span><span class="response-desc">successful operation</span><span class="status status--uncovered">uncovered</span></div><div class="response-item"><span class="response-code">400</span><span class="response-desc">Invalid ID supplied</span><span class="status status--uncovered">uncovered</span></div><div class="response-item"><span class="response-code">404</span><span class="response-desc">Order not found</span><span class="status status--uncovered">uncovered</span></div></div></details>
+        <details class="op"><summary><span class="method method--post">POST</span><span class="path">/store/order</span><span class="response">0/3 covered</span><span class="status status--uncovered">uncovered</span></summary><div class="op__summary">Place an order for a pet.</div><div class="responses"><div class="responses__label">Documented responses</div><div class="response-item"><span class="response-code">200</span><span class="response-desc">successful operation</span><span class="status status--uncovered">uncovered</span></div><div class="response-item"><span class="response-code">400</span><span class="response-desc">Invalid input</span><span class="status status--uncovered">uncovered</span></div><div class="response-item"><span class="response-code">422</span><span class="response-desc">Validation exception</span><span class="status status--uncovered">uncovered</span></div></div></details>
+        <details class="op"><summary><span class="method method--delete">DELETE</span><span class="path">/store/order/{orderId}</span><span class="response">0/3 covered</span><span class="status status--uncovered">uncovered</span></summary><div class="op__summary">Delete purchase order by identifier.</div><div class="responses"><div class="responses__label">Documented responses</div><div class="response-item"><span class="response-code">200</span><span class="response-desc">order deleted</span><span class="status status--uncovered">uncovered</span></div><div class="response-item"><span class="response-code">400</span><span class="response-desc">Invalid ID supplied</span><span class="status status--uncovered">uncovered</span></div><div class="response-item"><span class="response-code">404</span><span class="response-desc">Order not found</span><span class="status status--uncovered">uncovered</span></div></div></details>
+      </div>
+    </details>
+    <details class="tag" open>
+      <summary class="tag__summary">
+        <div class="tag__header">
+          <h2>user</h2>
+          <div class="tag__meta">
+            <span class="tag__meta-item tag__meta-item--covered">0 covered</span>
+            <span class="tag__meta-item tag__meta-item--partial">0 partial</span>
+            <span class="tag__meta-item tag__meta-item--uncovered">7 uncovered</span>
+          </div>
+        </div>
+        <div class="tag__bar">
+          <div class="tag__bar-fill" style="width: 0.0%"></div>
+        </div>
+      </summary>
+      <div class="ops">
+        <details class="op"><summary><span class="method method--get">GET</span><span class="path">/user/login</span><span class="response">0/2 covered</span><span class="status status--uncovered">uncovered</span></summary><div class="op__summary">Logs user into the system.</div><div class="responses"><div class="responses__label">Documented responses</div><div class="response-item"><span class="response-code">200</span><span class="response-desc">successful operation</span><span class="status status--uncovered">uncovered</span></div><div class="response-item"><span class="response-code">400</span><span class="response-desc">Invalid username/password supplied</span><span class="status status--uncovered">uncovered</span></div></div></details>
+        <details class="op"><summary><span class="method method--get">GET</span><span class="path">/user/logout</span><span class="response">0/1 covered</span><span class="status status--uncovered">uncovered</span></summary><div class="op__summary">Logs out current logged in user session.</div><div class="responses"><div class="responses__label">Documented responses</div><div class="response-item"><span class="response-code">200</span><span class="response-desc">successful operation</span><span class="status status--uncovered">uncovered</span></div></div></details>
+        <details class="op"><summary><span class="method method--get">GET</span><span class="path">/user/{username}</span><span class="response">0/3 covered</span><span class="status status--uncovered">uncovered</span></summary><div class="op__summary">Get user by user name.</div><div class="responses"><div class="responses__label">Documented responses</div><div class="response-item"><span class="response-code">200</span><span class="response-desc">successful operation</span><span class="status status--uncovered">uncovered</span></div><div class="response-item"><span class="response-code">400</span><span class="response-desc">Invalid username supplied</span><span class="status status--uncovered">uncovered</span></div><div class="response-item"><span class="response-code">404</span><span class="response-desc">User not found</span><span class="status status--uncovered">uncovered</span></div></div></details>
+        <details class="op"><summary><span class="method method--post">POST</span><span class="path">/user</span><span class="response">0/1 covered</span><span class="status status--uncovered">uncovered</span></summary><div class="op__summary">Create user.</div><div class="responses"><div class="responses__label">Documented responses</div><div class="response-item"><span class="response-code">200</span><span class="response-desc">successful operation</span><span class="status status--uncovered">uncovered</span></div></div></details>
+        <details class="op"><summary><span class="method method--post">POST</span><span class="path">/user/createWithList</span><span class="response">0/1 covered</span><span class="status status--uncovered">uncovered</span></summary><div class="op__summary">Creates list of users with given input array.</div><div class="responses"><div class="responses__label">Documented responses</div><div class="response-item"><span class="response-code">200</span><span class="response-desc">Successful operation</span><span class="status status--uncovered">uncovered</span></div></div></details>
+        <details class="op"><summary><span class="method method--put">PUT</span><span class="path">/user/{username}</span><span class="response">0/3 covered</span><span class="status status--uncovered">uncovered</span></summary><div class="op__summary">Update user resource.</div><div class="responses"><div class="responses__label">Documented responses</div><div class="response-item"><span class="response-code">200</span><span class="response-desc">successful operation</span><span class="status status--uncovered">uncovered</span></div><div class="response-item"><span class="response-code">400</span><span class="response-desc">bad request</span><span class="status status--uncovered">uncovered</span></div><div class="response-item"><span class="response-code">404</span><span class="response-desc">user not found</span><span class="status status--uncovered">uncovered</span></div></div></details>
+        <details class="op"><summary><span class="method method--delete">DELETE</span><span class="path">/user/{username}</span><span class="response">0/3 covered</span><span class="status status--uncovered">uncovered</span></summary><div class="op__summary">Delete user resource.</div><div class="responses"><div class="responses__label">Documented responses</div><div class="response-item"><span class="response-code">200</span><span class="response-desc">User deleted</span><span class="status status--uncovered">uncovered</span></div><div class="response-item"><span class="response-code">400</span><span class="response-desc">Invalid username supplied</span><span class="status status--uncovered">uncovered</span></div><div class="response-item"><span class="response-code">404</span><span class="response-desc">User not found</span><span class="status status--uncovered">uncovered</span></div></div></details>
+      </div>
+    </details>
+    <details class="tag tag--extra">
+      <summary class="tag__summary">
+        <div class="tag__header">
+          <h2>Extra requests</h2>
+          <div class="tag__meta"><span>Not in spec</span></div>
+        </div>
+      </summary>
+      <div class="ops">
+        <div class="op"><span class="method method--get">GET</span><span class="path">/api/v3/openapi.json</span><span class="path path--normalized">-> /openapi.json</span><span class="response">200</span><span class="status status--extra">extra</span></div>
+      </div>
+    </details>
+  </div>
+</body>
+</html>
