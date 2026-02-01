@@ -85,23 +85,25 @@ class HtmlReporter:
 
             html_parts.extend(
                 [
-                    '    <section class="tag">',
-                    '      <div class="tag__header">',
-                    f"        <h2>{escape(tag_name)}</h2>",
-                    '        <div class="tag__meta">',
-                    f"          <span>{covered_count} covered</span>",
-                    f"          <span>{total_count - covered_count} uncovered</span>",
-                    f"          <span>{tag_coverage:.1f}%</span>",
+                    '    <details class="tag" open>',
+                    '      <summary class="tag__summary">',
+                    '        <div class="tag__header">',
+                    f"          <h2>{escape(tag_name)}</h2>",
+                    '          <div class="tag__meta">',
+                    f"            <span>{covered_count} covered</span>",
+                    f"            <span>{total_count - covered_count} uncovered</span>",
+                    f"            <span>{tag_coverage:.1f}%</span>",
+                    "          </div>",
                     "        </div>",
-                    "      </div>",
-                    '      <div class="tag__bar">',
-                    f'        <div class="tag__bar-fill" style="width: {tag_coverage:.1f}%"></div>',
-                    "      </div>",
+                    '        <div class="tag__bar">',
+                    f'          <div class="tag__bar-fill" style="width: {tag_coverage:.1f}%"></div>',
+                    "        </div>",
+                    "      </summary>",
                     '      <div class="ops">',
                 ]
             )
             html_parts.extend(self._render_groups(tag_groups))
-            html_parts.extend(["      </div>", "    </section>"])
+            html_parts.extend(["      </div>", "    </details>"])
 
         html_parts.extend(self._render_extra_section(extra))
         html_parts.extend(["  </div>", "</body>", "</html>"])
@@ -231,11 +233,13 @@ class HtmlReporter:
         if not extra:
             return []
         parts = [
-            '    <section class="tag tag--extra">',
-            '      <div class="tag__header">',
-            "        <h2>Extra requests</h2>",
-            '        <div class="tag__meta"><span>Not in spec</span></div>',
-            "      </div>",
+            '    <details class="tag tag--extra">',
+            '      <summary class="tag__summary">',
+            '        <div class="tag__header">',
+            "          <h2>Extra requests</h2>",
+            '          <div class="tag__meta"><span>Not in spec</span></div>',
+            "        </div>",
+            "      </summary>",
             '      <div class="ops">',
         ]
         for method, original_path, normalized_path, code in extra:
@@ -252,7 +256,7 @@ class HtmlReporter:
                 '<span class="status status--extra">extra</span>'
                 "</div>"
             )
-        parts.extend(["      </div>", "    </section>"])
+        parts.extend(["      </div>", "    </details>"])
         return parts
 
     def _group_sort_key(self, group: EndpointGroup) -> tuple[int, str]:
@@ -413,13 +417,39 @@ class HtmlReporter:
       box-shadow: var(--shadow);
     }
 
+    .tag__summary {
+      list-style: none;
+      cursor: pointer;
+      display: grid;
+      gap: 8px;
+      position: relative;
+      padding-right: 28px;
+    }
+
+    .tag__summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .tag__summary::after {
+      content: "▾";
+      position: absolute;
+      right: 0;
+      top: 2px;
+      color: var(--muted);
+      font-size: 1rem;
+      transition: transform 0.2s ease;
+    }
+
+    details.tag[open] > .tag__summary::after {
+      transform: rotate(180deg);
+    }
+
     .tag__header {
       display: flex;
       align-items: baseline;
       justify-content: space-between;
       gap: 16px;
       flex-wrap: wrap;
-      margin-bottom: 12px;
     }
 
     .tag__meta {
@@ -434,7 +464,6 @@ class HtmlReporter:
       border-radius: 999px;
       background: #e2e8f0;
       overflow: hidden;
-      margin-bottom: 16px;
     }
 
     .tag__bar-fill {
@@ -445,6 +474,7 @@ class HtmlReporter:
     .ops {
       display: grid;
       gap: 10px;
+      margin-top: 12px;
     }
 
     .op {
