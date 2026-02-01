@@ -82,6 +82,7 @@ class HtmlReporter:
             tag_groups = tags_map[tag_name]
             covered_count, total_count = self._count_group_coverage(tag_groups)
             tag_coverage = (covered_count / total_count * 100) if total_count else 0.0
+            group_status = self._count_group_status(tag_groups)
 
             html_parts.extend(
                 [
@@ -90,9 +91,9 @@ class HtmlReporter:
                     '        <div class="tag__header">',
                     f"          <h2>{escape(tag_name)}</h2>",
                     '          <div class="tag__meta">',
-                    f"            <span>{covered_count} covered</span>",
-                    f"            <span>{total_count - covered_count} uncovered</span>",
-                    f"            <span>{tag_coverage:.1f}%</span>",
+                    f'            <span class="tag__meta-item tag__meta-item--covered">{group_status["covered"]} covered</span>',
+                    f'            <span class="tag__meta-item tag__meta-item--partial">{group_status["partial"]} partial</span>',
+                    f'            <span class="tag__meta-item tag__meta-item--uncovered">{group_status["uncovered"]} uncovered</span>',
                     "          </div>",
                     "        </div>",
                     '        <div class="tag__bar">',
@@ -170,6 +171,20 @@ class HtmlReporter:
             covered += self._covered_response_count(group)
             total += len(group.responses)
         return covered, total
+
+    def _count_group_status(self, groups: list[EndpointGroup]) -> dict[str, int]:
+        counts = {"covered": 0, "partial": 0, "uncovered": 0}
+        for group in groups:
+            covered = self._covered_response_count(group)
+            total = len(group.responses)
+            label = self._coverage_label(covered, total)
+            if label == "covered":
+                counts["covered"] += 1
+            elif label == "uncovered" or label == "none":
+                counts["uncovered"] += 1
+            else:
+                counts["partial"] += 1
+        return counts
 
     def _render_groups(self, groups: list[EndpointGroup]) -> list[str]:
         if not groups:
@@ -457,6 +472,19 @@ class HtmlReporter:
       gap: 12px;
       color: var(--muted);
       font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .tag__meta-item--covered {
+      color: rgb(34, 197, 94);
+    }
+
+    .tag__meta-item--partial {
+      color: rgb(245, 158, 11);
+    }
+
+    .tag__meta-item--uncovered {
+      color: rgb(239, 68, 68);
     }
 
     .tag__bar {
