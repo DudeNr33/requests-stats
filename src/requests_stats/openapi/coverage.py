@@ -17,7 +17,7 @@ class NormalizedRecording:
 
 class Coverage:
     def __init__(self, openapi_file_path: str) -> None:
-        self.spec = openapi_parser.parse(openapi_file_path)
+        self.spec = openapi_parser.parse(openapi_file_path, strict_enum=False)
         self.covered: set[tuple[str, str, int]] = set()
         self.uncovered: set[tuple[str, str, int]] = set()
         self.extra: set[tuple[str, str, int]] = set()

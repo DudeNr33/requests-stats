@@ -44,11 +44,12 @@ class HtmlReporter:
             key=lambda item: (item[0], item[2], item[3], item[1]),
         )
 
-        covered_count = len(self.coverage.covered)
-        uncovered_count = len(self.coverage.uncovered)
-        total_count = covered_count + uncovered_count
+        summary_status = self._count_group_status(groups)
+        total_endpoints = sum(summary_status.values())
         coverage_percent = (
-            f"{(covered_count / total_count * 100):.1f}" if total_count else "0.0"
+            f"{(summary_status['covered'] / total_endpoints * 100):.1f}"
+            if total_endpoints
+            else "0.0"
         )
 
         tags: list[dict[str, object]] = []
@@ -82,9 +83,7 @@ class HtmlReporter:
         return cast(
             str,
             self._template().render(
-                covered_count=covered_count,
-                uncovered_count=uncovered_count,
-                extra_count=len(extra_items),
+                summary_status=summary_status,
                 coverage_percent=coverage_percent,
                 tags=tags,
                 extra=extra_items,

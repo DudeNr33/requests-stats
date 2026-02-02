@@ -366,9 +366,11 @@
         <p class="subtitle">Recorded requests vs. OpenAPI operations</p>
       </div>
       <div class="summary">
-        <div class="summary__metric"><span>{{ covered_count }}</span> covered</div>
-        <div class="summary__metric"><span>{{ uncovered_count }}</span> uncovered</div>
-        <div class="summary__metric"><span>{{ extra_count }}</span> extra</div>
+        <div class="tag__meta">
+          <span class="tag__meta-item tag__meta-item--covered">{{ summary_status.covered }} covered</span>
+          <span class="tag__meta-item tag__meta-item--partial">{{ summary_status.partial }} partial</span>
+          <span class="tag__meta-item tag__meta-item--uncovered">{{ summary_status.uncovered }} uncovered</span>
+        </div>
         <div class="summary__bar">
           <div class="summary__bar-fill" style="width: {{ coverage_percent }}%"></div>
         </div>
