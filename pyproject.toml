@@ -8,7 +8,10 @@ requires-python = ">=3.13"
 dependencies = ["requests>=2.32.5"]
 
 [project.optional-dependencies]
-openapi = ["openapi3-parser>=1.1.21"]
+openapi = [
+    "jinja2>=3.1.6",
+    "openapi3-parser>=1.1.21",
+]
 cli = [
     "typer>=0.19.2",
 ]
@@ -20,6 +23,7 @@ requests-stats = "requests_stats.cli:main"
 requires = ["uv_build>=0.8.17,<0.9.0"]
 build-backend = "uv_build"
 
+
 [dependency-groups]
 dev = [
   "mypy>=1.18.2",
@@ -28,5 +32,6 @@ dev = [
   "pytest-httpserver>=1.1.3",
   "pytest-pretty>=1.3.0",
   "ruff>=0.13.1",
+  "testcontainers>=4.10.0",
   "types-requests>=2.32.4.20250913",
 ]
