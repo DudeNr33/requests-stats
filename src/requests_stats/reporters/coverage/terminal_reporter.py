@@ -1,5 +1,5 @@
 from textwrap import dedent
-from requests_stats.openapi.coverage import Coverage
+from requests_stats.core.coverage import Coverage
 
 
 class TerminalReporter:

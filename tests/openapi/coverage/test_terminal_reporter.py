@@ -6,10 +6,10 @@ import requests
 import pytest
 from pytest_httpserver import HTTPServer
 
-from requests_stats.adapter import RecordingHTTPAdapter
-from requests_stats.recorder.in_memory_recorder import InMemoryRecorder
-from requests_stats.openapi.coverage import Coverage
-from requests_stats.openapi.terminal_reporter import TerminalReporter
+from requests_stats.adapters.requests import RecordingHTTPAdapter
+from requests_stats.storage.in_memory_storage import InMemoryStorage
+from requests_stats.core.coverage import Coverage
+from requests_stats.reporters.coverage.terminal_reporter import TerminalReporter
 
 
 MINIMAL_OPENAPI_SPEC = {
@@ -42,7 +42,7 @@ def minimal_spec(tmp_path: Path) -> str:
 
 def test_single_endpoint_uncovered(capsys, minimal_spec: str):
     # Arrange
-    recorder = InMemoryRecorder()
+    recorder = InMemoryStorage()
 
     # Act
     coverage = Coverage(openapi_file_path=minimal_spec)
@@ -68,9 +68,8 @@ def test_single_endpoint_covered(capsys, minimal_spec: str, httpserver: HTTPServ
     # Arrange
     httpserver.expect_request("/hello").respond_with_json({}, 200)
     session = requests.Session()
-    recorder = InMemoryRecorder()
-    # recorder = SQLiteRecorder(str(Path(minimal_spec).parent / "requests.db"))
-    adapter = RecordingHTTPAdapter(recorder=recorder)
+    recorder = InMemoryStorage()
+    adapter = RecordingHTTPAdapter(storage=recorder)
     session.mount(httpserver.url_for(""), adapter)
 
     # Act

@@ -4,7 +4,8 @@ from urllib.parse import urlparse
 
 import openapi_parser
 
-from requests_stats.recorder.base import Recorder, Recording
+from requests_stats.core.recording import Recording
+from requests_stats.core.base_storage import Storage
 
 
 @dataclass(frozen=True)
@@ -25,9 +26,9 @@ class Coverage:
         self._path_templates = self._build_path_templates()
         self._server_base_paths = self._build_server_base_paths()
 
-    def load(self, recorder: Recorder) -> None:
+    def load(self, storage: Storage) -> None:
         normalized_recordings = [
-            self._normalize_recording(rec) for rec in recorder.load()
+            self._normalize_recording(rec) for rec in storage.load()
         ]
         recorded_requests = {
             (rec.method, rec.normalized_path, rec.response_code)
@@ -64,10 +65,13 @@ class Coverage:
         return endpoints
 
     def _normalize_recording(self, recording: Recording) -> NormalizedRecording:
+        # TODO: check what is actually needed - maybe only path params?
         method = (recording.method or "").upper()
         original_path = recording.url or ""
         path = original_path
-        if "://" in path:
+        if (
+            "://" in path
+        ):  # TODO: should be taken care of by adapter, check how to enforce this
             parsed_url = urlparse(path)
             path = parsed_url.path
             if parsed_url.query:
