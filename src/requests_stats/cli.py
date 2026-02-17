@@ -2,10 +2,10 @@ from pathlib import Path
 
 import typer
 
-from requests_stats.recorder.sqlite_recorder import SQLiteRecorder
-from requests_stats.openapi.coverage import Coverage
-from requests_stats.openapi.terminal_reporter import TerminalReporter
-from requests_stats.openapi.html_reporter import HtmlReporter
+from requests_stats.storage.sqlite_storage import SQLiteStorage
+from requests_stats.core.coverage import Coverage
+from requests_stats.reporters.coverage.terminal_reporter import TerminalReporter
+from requests_stats.reporters.coverage.html_reporter import HtmlReporter
 
 
 app = typer.Typer()
@@ -23,9 +23,9 @@ def coverage(
     format: str = typer.Option("text", "--format", "-f"),
     output: Path | None = typer.Option(None, "--output", "-o"),
 ) -> None:
-    recorder = SQLiteRecorder(filepath=str(recording))
+    storage = SQLiteStorage(filepath=str(recording))
     coverage = Coverage(openapi_file_path=str(spec))
-    coverage.load(recorder)
+    coverage.load(storage)
 
     report_format = format.lower().strip()
     if report_format == "text":
@@ -48,6 +48,7 @@ def coverage(
 
 
 def main() -> None:
+    # entry point for script
     app()
 
 

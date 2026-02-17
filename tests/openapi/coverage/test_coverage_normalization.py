@@ -1,16 +1,9 @@
 import json
 from pathlib import Path
 
-from requests_stats.openapi.coverage import Coverage
-from requests_stats.recorder.base import Recording
-
-
-class ListRecorder:
-    def __init__(self, recordings: list[Recording]) -> None:
-        self._recordings = recordings
-
-    def load(self) -> list[Recording]:
-        return list(self._recordings)
+from requests_stats.core.coverage import Coverage
+from requests_stats.core.recording import Recording
+from requests_stats.storage.in_memory_storage import InMemoryStorage
 
 
 def write_spec(tmp_path: Path) -> Path:
@@ -42,16 +35,18 @@ def write_spec(tmp_path: Path) -> Path:
 
 def test_coverage_normalizes_server_prefix_and_templates(tmp_path: Path) -> None:
     spec_file = write_spec(tmp_path)
-    recordings = [
+    storage = InMemoryStorage()
+    storage.store(
         Recording(
             method="GET",
             url="/api/v3/pet/1001",
+            params="",
             response_code=200,
             duration=0.1,
         )
-    ]
+    )
     coverage = Coverage(openapi_file_path=str(spec_file))
-    coverage.load(ListRecorder(recordings))
+    coverage.load(storage)
 
     assert ("GET", "/pet/{petId}", 200) in coverage.covered
     assert coverage.extra == set()
@@ -59,16 +54,18 @@ def test_coverage_normalizes_server_prefix_and_templates(tmp_path: Path) -> None
 
 def test_coverage_strips_query_string(tmp_path: Path) -> None:
     spec_file = write_spec(tmp_path)
-    recordings = [
+    storage = InMemoryStorage()
+    storage.store(
         Recording(
             method="GET",
-            url="/api/v3/hello?status=available",
+            url="/api/v3/hello",
+            params="status=available",
             response_code=200,
             duration=0.1,
         )
-    ]
+    )
     coverage = Coverage(openapi_file_path=str(spec_file))
-    coverage.load(ListRecorder(recordings))
+    coverage.load(storage)
 
     assert ("GET", "/hello", 200) in coverage.covered
     assert coverage.extra == set()

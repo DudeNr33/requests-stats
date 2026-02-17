@@ -5,10 +5,10 @@ import requests
 from testcontainers.core.container import DockerContainer
 from testcontainers.core.wait_strategies import HttpWaitStrategy
 
-from requests_stats.adapter import RecordingHTTPAdapter
-from requests_stats.openapi.coverage import Coverage
-from requests_stats.openapi.html_reporter import HtmlReporter
-from requests_stats.recorder.sqlite_recorder import SQLiteRecorder
+from requests_stats.adapters.requests import RecordingHTTPAdapter
+from requests_stats.core.coverage import Coverage
+from requests_stats.reporters.coverage.html_reporter import HtmlReporter
+from requests_stats.storage.sqlite_storage import SQLiteStorage
 
 PETSTORE_IMAGE = "swaggerapi/petstore3"
 OPENAPI_PATH = "/api/v3/openapi.json"
@@ -31,10 +31,10 @@ def generate_petstore_html_report(output_path: Path, workdir: Path) -> str:
         spec_path.write_text(spec_response.text)
 
         db_path = workdir / "requests.db"
-        recorder = SQLiteRecorder(filepath=str(db_path))
+        storage = SQLiteStorage(filepath=str(db_path))
 
         session = requests.Session()
-        session.mount(base_url, RecordingHTTPAdapter(recorder=recorder))
+        session.mount(base_url, RecordingHTTPAdapter(storage=storage))
 
         pet_payload = {
             "id": 1001,
@@ -57,7 +57,7 @@ def generate_petstore_html_report(output_path: Path, workdir: Path) -> str:
         session.delete(f"{base_url}/api/v3/pet/1001", timeout=5)
 
         coverage = Coverage(openapi_file_path=str(spec_path))
-        coverage.load(recorder)
+        coverage.load(storage)
         HtmlReporter(coverage).create(output_path)
 
         return output_path.read_text()

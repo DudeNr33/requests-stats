@@ -7,7 +7,7 @@ from typing import cast
 
 from jinja2 import Environment, FileSystemLoader, Template, select_autoescape
 
-from requests_stats.openapi.coverage import Coverage
+from requests_stats.core.coverage import Coverage
 
 
 @dataclass(frozen=True)
@@ -173,9 +173,11 @@ class HtmlReporter:
             {
                 "code": code,
                 "description": description,
-                "status": "covered"
-                if (group.method, group.path, code) in self.coverage.covered
-                else "uncovered",
+                "status": (
+                    "covered"
+                    if (group.method, group.path, code) in self.coverage.covered
+                    else "uncovered"
+                ),
             }
             for code, description in group.responses
         ]
