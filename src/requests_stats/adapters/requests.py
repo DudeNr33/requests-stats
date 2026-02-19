@@ -35,8 +35,8 @@ class RecordingHTTPAdapter(HTTPAdapter):
         response = super().send(request, stream, timeout, verify, cert, proxies)
         recording = Recording(
             method=request.method or MISSING,
-            url=parsed.path or MISSING,
-            params=parsed.params or MISSING,
+            url=parsed.path,
+            params=parsed.params,
             response_code=response.status_code,
             duration=response.elapsed.total_seconds(),
         )
