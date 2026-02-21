@@ -3,8 +3,6 @@ from typing import cast
 from urllib.parse import urlparse, ParseResult
 from playwright.sync_api import Page as SyncPage, Request as SyncRequest
 
-# from playwright.async_api import Page as AsyncPage, Request as AsyncRequest
-
 from requests_stats.core.base_storage import Storage
 from requests_stats.core.recording import Recording
 
@@ -24,13 +22,15 @@ class SyncRequestHandler:
         parsed = cast(ParseResult, urlparse(request.url))
         if self.path_pattern and not self.path_pattern.match(parsed.path):
             return
-        # TODO: https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming lists this for "request time", but is this the same as requests `elapsed`?
         duration_ms = request.timing["responseStart"] - request.timing["requestStart"]
         self.storage.store(
             Recording(
                 method=request.method,
-                url=parsed.path,
+                scheme=parsed.scheme,
+                netloc=parsed.netloc,
+                path=parsed.path,
                 params=parsed.params,
+                query=parsed.query,
                 response_code=response.status,
                 duration=duration_ms / 1000,
             )
