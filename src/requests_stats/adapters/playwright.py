@@ -22,7 +22,12 @@ class SyncRequestHandler:
         parsed = cast(ParseResult, urlparse(request.url))
         if self.path_pattern and not self.path_pattern.match(parsed.path):
             return
-        duration_ms = request.timing["responseStart"] - request.timing["requestStart"]
+        start = request.timing.get("requestStart")
+        end = request.timing.get("responseEnd")
+        if start is None or end is None:
+            duration_ms = 0
+        else:
+            duration_ms = end - start
         self.storage.store(
             Recording(
                 method=request.method,
