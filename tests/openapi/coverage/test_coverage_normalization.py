@@ -39,8 +39,11 @@ def test_coverage_normalizes_server_prefix_and_templates(tmp_path: Path) -> None
     storage.store(
         Recording(
             method="GET",
-            url="/api/v3/pet/1001",
+            scheme="https",
+            netloc="example.com",
+            path="/api/v3/pet/1001",
             params="",
+            query="",
             response_code=200,
             duration=0.1,
         )
@@ -58,8 +61,11 @@ def test_coverage_strips_query_string(tmp_path: Path) -> None:
     storage.store(
         Recording(
             method="GET",
-            url="/api/v3/hello",
-            params="status=available",
+            scheme="https",
+            netloc="example.com",
+            path="/api/v3/hello",
+            params="",
+            query="status=available",
             response_code=200,
             duration=0.1,
         )

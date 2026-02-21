@@ -67,7 +67,7 @@ class Coverage:
     def _normalize_recording(self, recording: Recording) -> NormalizedRecording:
         # TODO: check what is actually needed - maybe only path params?
         method = (recording.method or "").upper()
-        original_path = recording.url or ""
+        original_path = recording.path or ""
         path = original_path
         if (
             "://" in path

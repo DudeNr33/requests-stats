@@ -9,16 +9,19 @@ class SQLiteStorage(Storage):
         self.connection = sqlite3.connect(filepath)
         self.cursor = self.connection.cursor()
         self.cursor.execute(
-            "CREATE TABLE IF NOT EXISTS requests(method, url, params, response_status, duration)"
+            "CREATE TABLE IF NOT EXISTS requests(method, scheme, netloc, path, params, query, response_code, duration)"
         )
 
     def store(self, recording: Recording) -> None:
         self.cursor.execute(
-            "INSERT INTO requests VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO requests VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             [
                 recording.method,
-                recording.url,
+                recording.scheme,
+                recording.netloc,
+                recording.path,
                 recording.params,
+                recording.query,
                 recording.response_code,
                 recording.duration,
             ],
