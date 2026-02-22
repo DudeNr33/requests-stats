@@ -9,7 +9,6 @@ def test_stores_unfiltered_requests(page: Page, petstore_container: str):
     handler = SyncRequestHandler(storage)
     handler.register_on(page)
     page.goto(petstore_container)
-    print(storage.recordings)
     assert len(storage.recordings) > 0
     assert any(x.path.startswith("/swagger-ui") for x in storage.recordings)
     assert any(x.path == "/" for x in storage.recordings)
