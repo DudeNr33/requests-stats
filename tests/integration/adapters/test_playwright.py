@@ -1,27 +1,24 @@
-import re
-from playwright.sync_api import Page, expect, Request
+from playwright.sync_api import Page
+
+from requests_stats.adapters.playwright import SyncRequestHandler
+from requests_stats.storage.in_memory_storage import InMemoryStorage
 
 
-requests = []
+def test_stores_unfiltered_requests(page: Page, petstore_container: str):
+    storage = InMemoryStorage()
+    handler = SyncRequestHandler(storage)
+    handler.register_on(page)
+    page.goto(petstore_container)
+    print(storage.recordings)
+    assert len(storage.recordings) > 0
+    assert any(x.path.startswith("/swagger-ui") for x in storage.recordings)
+    assert any(x.path == "/" for x in storage.recordings)
 
 
-def _capture_requests(request: Request) -> None:
-    response = request.response()
-    if not response:
-        return
-    requests.append(
-        (
-            request.method,
-            request.url,
-            response.status,
-        )
-    )
-
-
-def test_has_title(page: Page):
-    page.on("requestfinished", _capture_requests)
-    page.goto("https://playwright.dev")
-    page.expect_request
-    expect(page).to_have_title(re.compile("Playwright"))
-    assert len(requests) > 0
-    print(requests)
+def test_stores_filtered_requests(page: Page, petstore_container: str):
+    storage = InMemoryStorage()
+    handler = SyncRequestHandler(storage, path_pattern=r"/swagger-ui.*")
+    handler.register_on(page)
+    page.goto(petstore_container)
+    assert len(storage.recordings) > 0
+    assert all(x.path.startswith("/swagger-ui") for x in storage.recordings)
