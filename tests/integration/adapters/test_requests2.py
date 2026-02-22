@@ -1,4 +1,3 @@
-import re
 import time
 from pathlib import Path
 
@@ -25,14 +24,6 @@ def wait_for_petstore(base_url: str) -> None:
         except requests.RequestException:
             time.sleep(0.5)
     raise RuntimeError("petstore container did not become ready")
-
-
-def build_path_templates(paths: dict[str, object]) -> list[tuple[re.Pattern[str], str]]:
-    templates = []
-    for path in paths:
-        pattern = "^" + re.sub(r"\{[^/]+\}", "[^/]+", path) + "$"
-        templates.append((re.compile(pattern), path))
-    return templates
 
 
 def test_petstore_terminal_report(tmp_path: Path, capsys) -> None:
@@ -77,9 +68,5 @@ def test_petstore_terminal_report(tmp_path: Path, capsys) -> None:
 
         captured = capsys.readouterr()
 
-    expected_path = (
-        Path(__file__).resolve().parents[2]
-        / "fixtures"
-        / "petstore_terminal_report.txt"
-    )
+    expected_path = Path(__file__).resolve().parent / "petstore_terminal_report.txt"
     assert captured.out == expected_path.read_text()

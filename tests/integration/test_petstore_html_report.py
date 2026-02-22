@@ -67,9 +67,7 @@ def test_petstore_html_report(tmp_path: Path) -> None:
     output_path = tmp_path / "coverage.html"
     html = generate_petstore_html_report(output_path, tmp_path)
 
-    reference_path = (
-        Path(__file__).resolve().parent / "fixtures" / "petstore_html_report.html"
-    )
+    reference_path = Path(__file__).resolve().parent / "petstore_html_report.html"
     if not reference_path.exists():
         pytest.skip("Reference report missing. Generate and approve it first.")
 
