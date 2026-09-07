@@ -1,5 +1,5 @@
-from collections.abc import Generator
 import time
+from collections.abc import Generator
 
 import pytest
 import requests
@@ -22,7 +22,7 @@ def wait_for_petstore(base_url: str) -> None:
 
 
 @pytest.fixture(scope="session")
-def petstore_container() -> Generator[str, None, None]:
+def petstore_container() -> Generator[str]:
     with DockerContainer(PETSTORE_IMAGE).with_exposed_ports(8080) as container:
         host = container.get_container_host_ip()
         port = container.get_exposed_port(8080)
