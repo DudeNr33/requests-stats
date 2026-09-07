@@ -1,7 +1,9 @@
 import re
 from typing import cast
-from urllib.parse import urlparse, ParseResult
-from playwright.sync_api import Page as SyncPage, Request as SyncRequest
+from urllib.parse import ParseResult, urlparse
+
+from playwright.sync_api import Page as SyncPage
+from playwright.sync_api import Request as SyncRequest
 
 from requests_stats.core.base_storage import Storage
 from requests_stats.core.recording import Recording
