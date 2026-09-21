@@ -1,16 +1,15 @@
 import json
-from textwrap import dedent
 from pathlib import Path
+from textwrap import dedent
 
-import requests
 import pytest
+import requests
 from pytest_httpserver import HTTPServer
 
 from requests_stats.adapters.requests import RecordingHTTPAdapter
-from requests_stats.storage.in_memory_storage import InMemoryStorage
 from requests_stats.core.coverage import Coverage
 from requests_stats.reporters.coverage.terminal_reporter import TerminalReporter
-
+from requests_stats.storage.in_memory_storage import InMemoryStorage
 
 MINIMAL_OPENAPI_SPEC = {
     "openapi": "3.0.0",
