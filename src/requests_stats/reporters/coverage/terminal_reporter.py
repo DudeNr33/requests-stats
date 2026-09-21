@@ -1,4 +1,5 @@
 from textwrap import dedent
+
 from requests_stats.core.coverage import Coverage
 
 
