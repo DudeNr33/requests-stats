@@ -1,6 +1,6 @@
-import requests
 from unittest.mock import MagicMock
 
+import requests
 from pytest_httpserver import HTTPServer
 
 from requests_stats.adapters.requests import RecordingHTTPAdapter
