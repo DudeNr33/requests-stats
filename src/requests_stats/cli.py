@@ -2,11 +2,10 @@ from pathlib import Path
 
 import typer
 
-from requests_stats.storage.sqlite_storage import SQLiteStorage
 from requests_stats.core.coverage import Coverage
-from requests_stats.reporters.coverage.terminal_reporter import TerminalReporter
 from requests_stats.reporters.coverage.html_reporter import HtmlReporter
-
+from requests_stats.reporters.coverage.terminal_reporter import TerminalReporter
+from requests_stats.storage.sqlite_storage import SQLiteStorage
 
 app = typer.Typer()
 

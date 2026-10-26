@@ -4,8 +4,8 @@ from urllib.parse import urlparse
 
 import openapi_parser
 
-from requests_stats.core.recording import Recording
 from requests_stats.core.base_storage import Storage
+from requests_stats.core.recording import Recording
 
 
 @dataclass(frozen=True)
