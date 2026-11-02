@@ -1,4 +1,5 @@
 from typing import Protocol
+
 from requests_stats.core.recording import Recording
 
 
