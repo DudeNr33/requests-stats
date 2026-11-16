@@ -1,7 +1,7 @@
 import sqlite3
 
-from requests_stats.core.recording import Recording
 from requests_stats.core.base_storage import Storage
+from requests_stats.core.recording import Recording
 
 
 class SQLiteStorage(Storage):
